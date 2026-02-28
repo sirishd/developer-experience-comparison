@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Developer Experience Comparison — AI Platforms 2026</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f5f7fa; color: #2d3748; line-height: 1.5; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%); color: white; padding: 48px 40px 36px; }
+  .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  .header p { font-size: 16px; opacity: 0.85; max-width: 700px; }
+
+  /* Nav tabs */
+  .nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 40px; display: flex; gap: 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .nav button { background: none; border: none; padding: 14px 20px; font-size: 14px; font-weight: 600; color: #718096; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; }
+  .nav button:hover { color: #2b6cb0; }
+  .nav button.active { color: #2b6cb0; border-bottom-color: #2b6cb0; }
+
+  /* Sections */
+  .section { display: none; padding: 32px 40px 48px; max-width: 1300px; margin: 0 auto; }
+  .section.active { display: block; }
+  .section h2 { font-size: 24px; color: #1a365d; margin-bottom: 6px; }
+  .section .subtitle { font-size: 14px; color: #718096; margin-bottom: 28px; }
+
+  /* Heatmap */
+  .heatmap-container { overflow-x: auto; }
+  .heatmap { width: 100%; border-collapse: separate; border-spacing: 4px; }
+  .heatmap th { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4a5568; padding: 10px 12px; text-align: center; background: #edf2f7; border-radius: 6px; }
+  .heatmap th.company-col { text-align: left; min-width: 170px; }
+  .heatmap td { text-align: center; padding: 14px 10px; border-radius: 6px; font-weight: 700; font-size: 13px; color: #fff; cursor: default; transition: transform 0.15s, box-shadow 0.15s; }
+  .heatmap td:hover { transform: scale(1.04); box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .heatmap td.company-cell { text-align: left; color: #2d3748; background: #fff !important; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 10px; cursor: default; }
+  .heatmap td.company-cell:hover { transform: none; box-shadow: none; }
+  .heatmap .logo { width: 28px; height: 28px; border-radius: 6px; object-fit: contain; }
+
+  /* Rating colors */
+  .r-best { background: #38a169; }
+  .r-good { background: #68d391; color: #1a4731 !important; }
+  .r-avg { background: #ecc94b; color: #744210 !important; }
+  .r-below { background: #ed8936; color: #fff; }
+  .r-poor { background: #e53e3e; }
+  .r-na { background: #e2e8f0; color: #a0aec0 !important; font-weight: 500; }
+
+  .legend { display: flex; gap: 16px; margin-top: 18px; flex-wrap: wrap; align-items: center; }
+  .legend span { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .legend .swatch { width: 18px; height: 18px; border-radius: 4px; }
+
+  /* Cards grid */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 24px; margin-top: 8px; }
+  .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 28px; border: 1px solid #e2e8f0; }
+  .card h3 { font-size: 18px; color: #1a365d; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+  .card .tagline { font-size: 13px; color: #718096; margin-bottom: 16px; }
+  .card .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .card .meta-item { background: #f7fafc; border-radius: 8px; padding: 10px 12px; }
+  .card .meta-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a0aec0; font-weight: 700; }
+  .card .meta-value { font-size: 14px; font-weight: 600; color: #2d3748; }
+
+  /* Strengths / Challenges */
+  .sc-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  .sc-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; padding: 8px 12px; border-bottom: 2px solid #e2e8f0; }
+  .sc-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #edf2f7; vertical-align: top; }
+  .sc-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .badge-s { display: inline-block; background: #c6f6d5; color: #276749; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-right: 4px; }
+  .badge-c { display: inline-block; background: #fed7d7; color: #9b2c2c; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-right: 4px; }
+
+  /* Journey */
+  .journey-phases { display: flex; margin-bottom: 28px; gap: 0; }
+  .journey-phase { flex: 1; text-align: center; padding: 10px 6px; font-size: 13px; font-weight: 700; color: #fff; position: relative; }
+  .journey-phase:first-child { border-radius: 8px 0 0 8px; }
+  .journey-phase:last-child { border-radius: 0 8px 8px 0; }
+  .jp-1 { background: #2b6cb0; }
+  .jp-2 { background: #3182ce; }
+  .jp-3 { background: #4299e1; }
+  .jp-4 { background: #63b3ed; }
+  .jp-5 { background: #90cdf4; color: #2a4365 !important; }
+  .jp-6 { background: #bee3f8; color: #2a4365 !important; }
+
+  .journey-table { width: 100%; border-collapse: collapse; }
+  .journey-table th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+  .journey-table td { padding: 12px 10px; font-size: 13px; border-bottom: 1px solid #edf2f7; vertical-align: top; }
+  .journey-table tr:hover { background: #f7fafc; }
+  .check { color: #38a169; font-weight: 700; }
+  .cross { color: #e53e3e; font-weight: 700; }
+  .partial { color: #ecc94b; font-weight: 700; }
+
+  /* Pricing table */
+  .pricing-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 8px; }
+  .pricing-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px 20px; text-align: center; }
+  .pricing-card h4 { font-size: 16px; color: #1a365d; margin-bottom: 4px; }
+  .pricing-card .price { font-size: 28px; font-weight: 800; color: #2b6cb0; margin: 12px 0 4px; }
+  .pricing-card .price-note { font-size: 12px; color: #a0aec0; margin-bottom: 16px; }
+  .pricing-card ul { list-style: none; text-align: left; font-size: 13px; }
+  .pricing-card li { padding: 4px 0; border-bottom: 1px solid #f0f0f0; }
+  .pricing-card li:last-child { border-bottom: none; }
+
+  /* Tooltip */
+  .tip { position: relative; }
+  .tip .tiptext { visibility: hidden; background: #2d3748; color: #fff; font-size: 12px; font-weight: 400; padding: 8px 12px; border-radius: 6px; position: absolute; z-index: 10; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: max-content; max-width: 240px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none; opacity: 0; transition: opacity 0.2s; }
+  .tip:hover .tiptext { visibility: visible; opacity: 1; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .header { padding: 32px 20px 28px; }
+    .header h1 { font-size: 24px; }
+    .nav { padding: 0 16px; overflow-x: auto; }
+    .section { padding: 24px 16px 36px; }
+    .cards { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .pricing-grid { grid-template-columns: 1fr; }
+    .nav button { font-size: 12px; padding: 12px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>AI Developer Platform Comparison</h1>
+  <p>Developer experience assessment across GitHub Copilot, Google Antigravity, Figma, Anthropic, and OpenAI — February 2026</p>
+</div>
+
+<div class="nav" id="nav">
+  <button class="active" data-tab="heatmap">Summary Heatmap</button>
+  <button data-tab="overview">Platform Overview</button>
+  <button data-tab="journey">Developer Journey</button>
+  <button data-tab="pricing">Pricing</button>
+  <button data-tab="sc">Strengths &amp; Challenges</button>
+</div>
+
+<!-- ============ HEATMAP ============ -->
+<div class="section active" id="heatmap">
+  <h2>Anthropic leads with the strongest overall developer experience.</h2>
+  <p class="subtitle">Platform &amp; Developer Journey Assessment — rated Best / Good / Average / Below Average / Poor</p>
+
+  <div class="heatmap-container">
+  <table class="heatmap">
+    <thead>
+      <tr>
+        <th class="company-col">Platform</th>
+        <th>Docs &amp; Learning</th>
+        <th>Onboarding &amp; Setup</th>
+        <th>API / SDK Quality</th>
+        <th>Model / Tool Access</th>
+        <th>Pricing &amp; Value</th>
+        <th>Community &amp; Support</th>
+        <th>Ecosystem &amp; Integrations</th>
+        <th>Reliability &amp; Uptime</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- GitHub Copilot -->
+      <tr>
+        <td class="company-cell"><span style="font-size:22px;">🐙</span> GitHub Copilot</td>
+        <td class="r-good tip">Good<span class="tiptext">Solid docs, GitHub-native guides, growing tutorial ecosystem</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Install extension → sign in → done. Frictionless minutes-to-start</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Deep IDE integration, Copilot Extensions API, but limited outside GitHub ecosystem</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Multi-model (GPT-4o, Claude, Gemini) in Pro+; free tier has limits</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Free tier with 2K completions; Pro at $10/mo is strong value for individuals</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Massive GitHub community, 15M+ users, tight Stack Overflow/GH Discussions integration</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Native in VS Code, JetBrains, Neovim; deep GitHub Actions/PR integration</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Generally reliable; occasional slowdowns during peak usage</span></td>
+      </tr>
+      <!-- Google Antigravity -->
+      <tr>
+        <td class="company-cell"><span style="font-size:22px;">🚀</span> Google Antigravity</td>
+        <td class="r-avg tip">Avg<span class="tiptext">New platform (Nov 2025); docs improving but still early. Codelabs available</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Download IDE → free preview → agents ready. VS Code familiarity helps</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Agent-first architecture is novel; Artifacts system for verification is innovative</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Multi-model: Gemini 3 Pro, Claude Sonnet 4.5, GPT-OSS. Agent-orchestrated</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Free during preview; expected ~$20/mo for Pro. Exceptional value currently</span></td>
+        <td class="r-below tip">Below<span class="tiptext">Very new; community is small. Some user frustration with throttling in Jan 2026</span></td>
+        <td class="r-avg tip">Avg<span class="tiptext">Self-contained IDE; integrations with external tools still developing</span></td>
+        <td class="r-below tip">Below<span class="tiptext">Jan 2026 saw complaints about degraded performance and context window shrinkage</span></td>
+      </tr>
+      <!-- Figma -->
+      <tr>
+        <td class="company-cell"><span style="font-size:22px;">🎨</span> Figma</td>
+        <td class="r-good tip">Good<span class="tiptext">Well-organized dev docs, comprehensive API reference, plugin guides</span></td>
+        <td class="r-avg tip">Avg<span class="tiptext">Dev Mode requires separate seat purchase; OAuth app setup has new review requirements</span></td>
+        <td class="r-good tip">Good<span class="tiptext">REST API, Plugin API, Widget API — well-designed but design-focused scope</span></td>
+        <td class="r-avg tip">Avg<span class="tiptext">Design-to-code focused; AI credits being enforced in March 2026</span></td>
+        <td class="r-below tip">Below<span class="tiptext">Dev Mode at $25-35/user/mo is expensive; separate from design seats</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Strong design community; active plugin ecosystem with 3rd-party developers</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Integrations with Jira, Slack, Storybook, GitHub; Dev Mode bridges design-dev</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Mature platform with strong uptime track record</span></td>
+      </tr>
+      <!-- Anthropic -->
+      <tr>
+        <td class="company-cell"><span style="font-size:22px;">🧠</span> Anthropic</td>
+        <td class="r-best tip">Best<span class="tiptext">Excellent docs at platform.claude.com, Anthropic Academy, cookbook examples, prompt engineering guides</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Get API key → pip install anthropic → first call in under 5 min. Clean SDK design</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Clean REST API, official Python/TS SDKs, streaming, tool use, MCP, structured outputs</span></td>
+        <td class="r-good tip">Good<span class="tiptext">3 model tiers (Opus/Sonnet/Haiku); no image gen or TTS. Strong reasoning models</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Competitive API pricing; prompt caching saves up to 90%; no free API tier</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Growing Discord, active developer forums; smaller than OpenAI's but engaged</span></td>
+        <td class="r-good tip">Good<span class="tiptext">MCP protocol gaining adoption; Claude Code, Cursor, Windsurf integrations</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Generally reliable API; transparent status page and incident communication</span></td>
+      </tr>
+      <!-- OpenAI -->
+      <tr>
+        <td class="company-cell"><span style="font-size:22px;">🤖</span> OpenAI</td>
+        <td class="r-good tip">Good<span class="tiptext">Comprehensive docs, API reference, cookbook. Lots of community tutorials</span></td>
+        <td class="r-good tip">Good<span class="tiptext">Straightforward API key setup; SDK well-known. Playground helps experimentation</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Responses API, Agents SDK, function calling, structured outputs, vision, audio — broadest feature set</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Widest model range: GPT-5 family, o-series reasoning, DALL-E, Whisper, TTS, Codex</span></td>
+        <td class="r-avg tip">Avg<span class="tiptext">Premium model pricing (GPT-5 Pro is expensive); free tier limited; good caching discounts</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Largest AI dev community; DevDay conferences; massive 3rd-party ecosystem</span></td>
+        <td class="r-best tip">Best<span class="tiptext">Widest ecosystem: ChatGPT plugins, AgentKit, Codex, deep 3rd-party support everywhere</span></td>
+        <td class="r-avg tip">Avg<span class="tiptext">Occasional API outages and rate limit issues under heavy load; improving</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="legend">
+    <span><span class="swatch r-best"></span> Best</span>
+    <span><span class="swatch r-good"></span> Good</span>
+    <span><span class="swatch r-avg"></span> Average</span>
+    <span><span class="swatch r-below"></span> Below Avg</span>
+    <span><span class="swatch r-poor"></span> Poor</span>
+    <span style="color:#a0aec0; font-size:12px; margin-left:8px;">Hover cells for details</span>
+  </div>
+</div>
+
+<!-- ============ OVERVIEW ============ -->
+<div class="section" id="overview">
+  <h2>Platform Overview</h2>
+  <p class="subtitle">Key facts about each platform's developer offering</p>
+
+  <div class="cards">
+    <!-- GitHub Copilot -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🐙</span> GitHub Copilot</h3>
+      <p class="tagline">AI pair programmer embedded in your IDE</p>
+      <div class="meta">
+        <div class="meta-item"><div class="meta-label">Launched</div><div class="meta-value">June 2022</div></div>
+        <div class="meta-item"><div class="meta-label">Users</div><div class="meta-value">15M+ (1.3M paid)</div></div>
+        <div class="meta-item"><div class="meta-label">Primary Use</div><div class="meta-value">Code completion, chat, code review</div></div>
+        <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">GPT-4o, Claude, Gemini (Pro+)</div></div>
+      </div>
+      <p style="font-size:13px; color:#4a5568;">The most widely adopted AI coding assistant. Deeply integrated with GitHub's ecosystem — from code completion to PR reviews and Actions. The free tier with 2K completions and 50 chats makes it the most accessible entry point for AI-assisted development.</p>
+    </div>
+
+    <!-- Google Antigravity -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🚀</span> Google Antigravity</h3>
+      <p class="tagline">Agent-first AI IDE powered by Gemini 3</p>
+      <div class="meta">
+        <div class="meta-item"><div class="meta-label">Launched</div><div class="meta-value">November 2025</div></div>
+        <div class="meta-item"><div class="meta-label">Origin</div><div class="meta-value">Windsurf acq. ($2.4B)</div></div>
+        <div class="meta-item"><div class="meta-label">Primary Use</div><div class="meta-value">Agentic development, autonomous coding</div></div>
+        <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">Gemini 3 Pro, Claude, GPT-OSS</div></div>
+      </div>
+      <p style="font-size:13px; color:#4a5568;">Google's bold entry into AI IDEs. Rather than suggesting code, Antigravity deploys autonomous agents that plan, execute, and verify entire workflows. The Artifacts system gives developers transparency into agent reasoning. Built as a VS Code fork — familiar yet fundamentally different.</p>
+    </div>
+
+    <!-- Figma -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🎨</span> Figma</h3>
+      <p class="tagline">Design-to-development platform with APIs &amp; Dev Mode</p>
+      <div class="meta">
+        <div class="meta-item"><div class="meta-label">Dev Platform</div><div class="meta-value">REST API, Plugin API, Widget API</div></div>
+        <div class="meta-item"><div class="meta-label">Dev Mode</div><div class="meta-value">Launched 2023</div></div>
+        <div class="meta-item"><div class="meta-label">Primary Use</div><div class="meta-value">Design handoff, plugin dev, automation</div></div>
+        <div class="meta-item"><div class="meta-label">AI Features</div><div class="meta-value">AI credits enforced Mar 2026</div></div>
+      </div>
+      <p style="font-size:13px; color:#4a5568;">Figma's developer platform bridges design and engineering through Dev Mode, APIs, and a thriving plugin ecosystem. The REST API supports webhooks, file access, and granular permissions. New OAuth requirements (Nov 2025) added friction but improved security and reliability.</p>
+    </div>
+
+    <!-- Anthropic -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🧠</span> Anthropic</h3>
+      <p class="tagline">Claude API — clean, powerful, developer-friendly</p>
+      <div class="meta">
+        <div class="meta-item"><div class="meta-label">API Launched</div><div class="meta-value">March 2023</div></div>
+        <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">Opus 4.6, Sonnet 4.5, Haiku 4.5</div></div>
+        <div class="meta-item"><div class="meta-label">Primary Use</div><div class="meta-value">LLM API, agent building, Claude Code</div></div>
+        <div class="meta-item"><div class="meta-label">Key Innovation</div><div class="meta-value">MCP, structured outputs, tool use</div></div>
+      </div>
+      <p style="font-size:13px; color:#4a5568;">Anthropic has earned a reputation for the cleanest developer experience among LLM API providers. The SDK design is intuitive, documentation is thorough with practical examples, and features like Model Context Protocol (MCP) are setting new standards for agent-tool interoperability. Claude Code provides a powerful CLI for agentic coding.</p>
+    </div>
+
+    <!-- OpenAI -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🤖</span> OpenAI</h3>
+      <p class="tagline">The broadest AI platform — models, tools, and ecosystem</p>
+      <div class="meta">
+        <div class="meta-item"><div class="meta-label">API Launched</div><div class="meta-value">March 2023</div></div>
+        <div class="meta-item"><div class="meta-label">Models</div><div class="meta-value">GPT-5.1, o4-mini, DALL-E, Whisper</div></div>
+        <div class="meta-item"><div class="meta-label">Primary Use</div><div class="meta-value">LLM API, agents, multimodal AI</div></div>
+        <div class="meta-item"><div class="meta-label">Key Innovation</div><div class="meta-value">Agents SDK, AgentKit, Codex</div></div>
+      </div>
+      <p style="font-size:13px; color:#4a5568;">OpenAI offers the widest model range and broadest feature set of any AI API provider. From text and code to images, audio, and video — it's the most complete platform. The Agents SDK, Responses API, and DevDay ecosystem make it the default choice for many teams, though premium pricing and occasional reliability issues are tradeoffs.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ JOURNEY ============ -->
+<div class="section" id="journey">
+  <h2>Developer Journey Comparison</h2>
+  <p class="subtitle">How each platform supports developers at every stage</p>
+
+  <div class="journey-phases">
+    <div class="journey-phase jp-1">Discover &amp; Learn</div>
+    <div class="journey-phase jp-2">Onboard &amp; Setup</div>
+    <div class="journey-phase jp-3">Build &amp; Integrate</div>
+    <div class="journey-phase jp-4">Test &amp; Debug</div>
+    <div class="journey-phase jp-5">Deploy &amp; Ship</div>
+    <div class="journey-phase jp-6">Manage &amp; Scale</div>
+  </div>
+
+  <!-- Discover & Learn -->
+  <h3 style="font-size:16px; color:#2b6cb0; margin:24px 0 10px;">Discover &amp; Learn</h3>
+  <table class="journey-table">
+    <thead><tr><th style="width:170px;">Capability</th><th>GitHub Copilot</th><th>Google Antigravity</th><th>Figma</th><th>Anthropic</th><th>OpenAI</th></tr></thead>
+    <tbody>
+      <tr><td>Official Docs</td><td class="check">✔ Comprehensive</td><td class="partial">◐ Growing</td><td class="check">✔ Thorough</td><td class="check">✔ Excellent</td><td class="check">✔ Comprehensive</td></tr>
+      <tr><td>Interactive Tutorials</td><td class="check">✔ GitHub Skills</td><td class="check">✔ Codelabs</td><td class="check">✔ Playground</td><td class="check">✔ Academy courses</td><td class="check">✔ Cookbook + Playground</td></tr>
+      <tr><td>Video Content</td><td class="check">✔ Extensive</td><td class="partial">◐ Limited</td><td class="check">✔ Good</td><td class="partial">◐ Growing</td><td class="check">✔ DevDay talks</td></tr>
+      <tr><td>Developer Events</td><td class="check">✔ GitHub Universe</td><td class="partial">◐ Google I/O mentions</td><td class="check">✔ Config conference</td><td class="check">✔ Code with Claude</td><td class="check">✔ DevDay</td></tr>
+      <tr><td>Community Forums</td><td class="check">✔ GH Discussions</td><td class="partial">◐ Nascent</td><td class="check">✔ Figma Forum</td><td class="check">✔ Discord + Forum</td><td class="check">✔ Large community forum</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Onboard & Setup -->
+  <h3 style="font-size:16px; color:#3182ce; margin:24px 0 10px;">Onboard &amp; Setup</h3>
+  <table class="journey-table">
+    <thead><tr><th style="width:170px;">Capability</th><th>GitHub Copilot</th><th>Google Antigravity</th><th>Figma</th><th>Anthropic</th><th>OpenAI</th></tr></thead>
+    <tbody>
+      <tr><td>Time to First Value</td><td><strong>&lt;5 min</strong></td><td><strong>~10 min</strong> (download IDE)</td><td><strong>~15 min</strong> (seat + setup)</td><td><strong>&lt;5 min</strong></td><td><strong>~5 min</strong></td></tr>
+      <tr><td>Free Tier Available</td><td class="check">✔ 2K completions/mo</td><td class="check">✔ Free preview</td><td class="cross">✘ Paid Dev seats</td><td class="cross">✘ API requires credits</td><td class="partial">◐ Limited free credits</td></tr>
+      <tr><td>SDK / CLI Install</td><td>IDE extension</td><td>Desktop app download</td><td>npm figma-js or REST</td><td>pip install anthropic</td><td>pip install openai</td></tr>
+      <tr><td>Auth Method</td><td>GitHub SSO</td><td>Google account</td><td>OAuth 2.0 (reviewed)</td><td>API key</td><td>API key</td></tr>
+      <tr><td>Quickstart Quality</td><td class="check">✔ Excellent</td><td class="check">✔ Good Codelabs</td><td class="check">✔ Good</td><td class="check">✔ Excellent</td><td class="check">✔ Good</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Build & Integrate -->
+  <h3 style="font-size:16px; color:#4299e1; margin:24px 0 10px;">Build &amp; Integrate</h3>
+  <table class="journey-table">
+    <thead><tr><th style="width:170px;">Capability</th><th>GitHub Copilot</th><th>Google Antigravity</th><th>Figma</th><th>Anthropic</th><th>OpenAI</th></tr></thead>
+    <tbody>
+      <tr><td>Primary Language SDKs</td><td>Multi-IDE plugins</td><td>Built-in IDE</td><td>JS/TS (REST + Plugin)</td><td>Python, TypeScript, Java, Go</td><td>Python, TypeScript, .NET, Java, Go</td></tr>
+      <tr><td>Streaming Support</td><td>Real-time suggestions</td><td>Agent live output</td><td>Webhooks</td><td class="check">✔ SSE streaming</td><td class="check">✔ SSE streaming</td></tr>
+      <tr><td>Tool / Function Calling</td><td>Copilot Extensions</td><td>Agent tool use</td><td>Plugin API actions</td><td class="check">✔ Tool use + MCP</td><td class="check">✔ Function calling</td></tr>
+      <tr><td>Structured Outputs</td><td>N/A</td><td>Artifacts system</td><td>JSON API responses</td><td class="check">✔ JSON schema</td><td class="check">✔ JSON schema</td></tr>
+      <tr><td>Multimodal Input</td><td>Code + context</td><td>Code + browser + terminal</td><td>Design files</td><td class="check">✔ Text + images + PDF</td><td class="check">✔ Text, images, audio, PDF, video</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Test & Debug -->
+  <h3 style="font-size:16px; color:#63b3ed; margin:24px 0 10px;">Test &amp; Debug</h3>
+  <table class="journey-table">
+    <thead><tr><th style="width:170px;">Capability</th><th>GitHub Copilot</th><th>Google Antigravity</th><th>Figma</th><th>Anthropic</th><th>OpenAI</th></tr></thead>
+    <tbody>
+      <tr><td>Interactive Playground</td><td class="cross">✘</td><td>Agent Manager UI</td><td class="check">✔ Plugin sandbox</td><td class="check">✔ Workbench</td><td class="check">✔ Playground</td></tr>
+      <tr><td>Test Generation</td><td class="check">✔ Code review + tests</td><td class="check">✔ Agent-generated</td><td class="cross">✘</td><td class="partial">◐ Via prompting</td><td class="partial">◐ Via prompting</td></tr>
+      <tr><td>Debugging Tools</td><td>IDE-native debugging</td><td>Artifacts for verification</td><td>Console + DevTools</td><td>Detailed error responses</td><td>Detailed error responses</td></tr>
+      <tr><td>Evaluation / Evals</td><td class="cross">✘</td><td class="partial">◐ Basic</td><td class="cross">✘</td><td class="check">✔ Eval framework</td><td class="check">✔ Evals library</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Deploy & Ship -->
+  <h3 style="font-size:16px; color:#4a90a8; margin:24px 0 10px;">Deploy &amp; Ship</h3>
+  <table class="journey-table">
+    <thead><tr><th style="width:170px;">Capability</th><th>GitHub Copilot</th><th>Google Antigravity</th><th>Figma</th><th>Anthropic</th><th>OpenAI</th></tr></thead>
+    <tbody>
+      <tr><td>CI/CD Integration</td><td class="check">✔ GitHub Actions</td><td class="partial">◐ Developing</td><td class="check">✔ Webhooks</td><td class="partial">◐ Via API</td><td class="partial">◐ Via API</td></tr>
+      <tr><td>Plugin / App Publishing</td><td class="check">✔ Copilot Extensions</td><td class="cross">✘ Not yet</td><td class="check">✔ Community plugins</td><td class="cross">✘</td><td class="check">✔ GPT Store / Plugins</td></tr>
+      <tr><td>Rate Limit Transparency</td><td class="check">✔ Documented</td><td class="partial">◐ Quota-based</td><td class="check">✔ Documented (updated Nov 2025)</td><td class="check">✔ Documented</td><td class="check">✔ Tiered system</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Manage & Scale -->
+  <h3 style="font-size:16px; color:#6da0b8; margin:24px 0 10px;">Manage &amp; Scale</h3>
+  <table class="journey-table">
+    <thead><tr><th style="width:170px;">Capability</th><th>GitHub Copilot</th><th>Google Antigravity</th><th>Figma</th><th>Anthropic</th><th>OpenAI</th></tr></thead>
+    <tbody>
+      <tr><td>Usage Analytics</td><td class="check">✔ Copilot Metrics</td><td class="partial">◐ Basic</td><td class="check">✔ API analytics</td><td class="check">✔ Console dashboard</td><td class="check">✔ Usage dashboard</td></tr>
+      <tr><td>Team / Org Management</td><td class="check">✔ Business + Enterprise</td><td class="partial">◐ Planned</td><td class="check">✔ Org + Enterprise plans</td><td class="check">✔ Organizations</td><td class="check">✔ Organizations</td></tr>
+      <tr><td>Cost Controls</td><td>Per-seat pricing</td><td>Quota-based (preview)</td><td>Per-seat pricing</td><td class="check">✔ Spending limits, caching</td><td class="check">✔ Spending limits, batch API</td></tr>
+      <tr><td>Enterprise SSO / Security</td><td class="check">✔ SAML SSO</td><td class="partial">◐ Google Workspace</td><td class="check">✔ SAML SSO</td><td class="check">✔ SSO available</td><td class="check">✔ SSO available</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ PRICING ============ -->
+<div class="section" id="pricing">
+  <h2>Pricing Comparison</h2>
+  <p class="subtitle">Entry-level individual pricing for developer tools (as of Feb 2026)</p>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <h4>🐙 GitHub Copilot</h4>
+      <div class="price">$0–$39</div>
+      <div class="price-note">per user / month</div>
+      <ul>
+        <li><strong>Free:</strong> 2K completions, 50 chats</li>
+        <li><strong>Pro:</strong> $10/mo — unlimited completions</li>
+        <li><strong>Pro+:</strong> $39/mo — multi-model, Copilot agent</li>
+        <li><strong>Business:</strong> $19/user/mo</li>
+        <li><strong>Enterprise:</strong> $39/user/mo</li>
+      </ul>
+    </div>
+
+    <div class="pricing-card">
+      <h4>🚀 Google Antigravity</h4>
+      <div class="price">Free*</div>
+      <div class="price-note">preview pricing</div>
+      <ul>
+        <li><strong>Individual:</strong> Free (weekly quotas)</li>
+        <li><strong>Pro (expected):</strong> ~$20/mo</li>
+        <li><strong>Enterprise (expected):</strong> ~$40-60/user/mo</li>
+        <li>AI Pro/Ultra subs get priority</li>
+        <li>*Preview pricing — will change in 2026</li>
+      </ul>
+    </div>
+
+    <div class="pricing-card">
+      <h4>🎨 Figma</h4>
+      <div class="price">$25–$35</div>
+      <div class="price-note">Dev seat / month</div>
+      <ul>
+        <li><strong>Dev Mode (Org):</strong> $25/user/mo</li>
+        <li><strong>Dev Mode (Ent):</strong> $35/user/mo</li>
+        <li><strong>Full Seat (Pro):</strong> $15/editor/mo</li>
+        <li><strong>Full Seat (Org):</strong> $45/editor/mo</li>
+        <li>REST API free with any plan</li>
+      </ul>
+    </div>
+
+    <div class="pricing-card">
+      <h4>🧠 Anthropic</h4>
+      <div class="price">Pay-per-use</div>
+      <div class="price-note">API token pricing</div>
+      <ul>
+        <li><strong>Haiku 4.5:</strong> $1 / $5 per M tokens</li>
+        <li><strong>Sonnet 4.5:</strong> $3 / $15 per M tokens</li>
+        <li><strong>Opus 4.6:</strong> $5 / $25 per M tokens</li>
+        <li>Prompt caching: up to 90% savings</li>
+        <li>Batch API: 50% discount</li>
+      </ul>
+    </div>
+
+    <div class="pricing-card">
+      <h4>🤖 OpenAI</h4>
+      <div class="price">Pay-per-use</div>
+      <div class="price-note">API token pricing</div>
+      <ul>
+        <li><strong>GPT-5 Nano:</strong> $0.05 / $0.40 per M</li>
+        <li><strong>GPT-5:</strong> $1.25 / $10 per M tokens</li>
+        <li><strong>GPT-5 Pro:</strong> $21 / $168 per M</li>
+        <li>Caching: 90% input discount</li>
+        <li>Batch API: 50% discount</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STRENGTHS & CHALLENGES ============ -->
+<div class="section" id="sc">
+  <h2>Strengths &amp; Challenges</h2>
+  <p class="subtitle">Key advantages and pain points for each platform</p>
+
+  <div class="cards" style="grid-template-columns: 1fr;">
+
+    <!-- GitHub Copilot -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🐙</span> GitHub Copilot</h3>
+      <table class="sc-table">
+        <thead><tr><th style="width:50%;">Strengths</th><th>Challenges</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge-s">1</span> <strong>Frictionless onboarding</strong> — install extension and go. 55% productivity gains reported</td>
+              <td><span class="badge-c">1</span> <strong>Security concerns</strong> — 29% of generated Python code has vulnerabilities</td></tr>
+          <tr><td><span class="badge-s">2</span> <strong>Massive user base</strong> — 15M+ users, strong network effects and community</td>
+              <td><span class="badge-c">2</span> <strong>Complex task accuracy</strong> — struggles with multi-class interactions and large codebases</td></tr>
+          <tr><td><span class="badge-s">3</span> <strong>GitHub ecosystem integration</strong> — PR reviews, Actions, Issues, code search</td>
+              <td><span class="badge-c">3</span> <strong>Limited outside GitHub</strong> — strongest value tied to GitHub workflows</td></tr>
+          <tr><td><span class="badge-s">4</span> <strong>Best free tier</strong> — 2K completions at $0 makes it the most accessible option</td>
+              <td><span class="badge-c">4</span> <strong>Multi-model only at Pro+</strong> — $39/mo required for model choice</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Google Antigravity -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🚀</span> Google Antigravity</h3>
+      <table class="sc-table">
+        <thead><tr><th style="width:50%;">Strengths</th><th>Challenges</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge-s">1</span> <strong>Agent-first paradigm</strong> — autonomous agents that plan, execute, and verify code</td>
+              <td><span class="badge-c">1</span> <strong>Platform maturity</strong> — launched Nov 2025, still in preview with limited docs</td></tr>
+          <tr><td><span class="badge-s">2</span> <strong>Artifacts system</strong> — unique transparency into agent reasoning and verification</td>
+              <td><span class="badge-c">2</span> <strong>Reliability concerns</strong> — Jan 2026 saw degraded performance and context shrinkage</td></tr>
+          <tr><td><span class="badge-s">3</span> <strong>Multi-model support</strong> — Gemini 3 Pro, Claude, GPT-OSS built in</td>
+              <td><span class="badge-c">3</span> <strong>Community trust</strong> — Windsurf acquisition created uncertainty; throttling frustrations</td></tr>
+          <tr><td><span class="badge-s">4</span> <strong>Free during preview</strong> — exceptional value while it lasts</td>
+              <td><span class="badge-c">4</span> <strong>Pricing uncertainty</strong> — final pricing model not yet announced</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Figma -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🎨</span> Figma</h3>
+      <table class="sc-table">
+        <thead><tr><th style="width:50%;">Strengths</th><th>Challenges</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge-s">1</span> <strong>Design-dev bridge</strong> — Dev Mode uniquely solves the design handoff problem</td>
+              <td><span class="badge-c">1</span> <strong>Expensive Dev seats</strong> — $25-35/user/mo just for Dev Mode access</td></tr>
+          <tr><td><span class="badge-s">2</span> <strong>Mature plugin ecosystem</strong> — thousands of community plugins and widgets</td>
+              <td><span class="badge-c">2</span> <strong>Narrow developer scope</strong> — focused on design tooling, not general-purpose AI</td></tr>
+          <tr><td><span class="badge-s">3</span> <strong>Well-designed APIs</strong> — REST, Plugin, and Widget APIs are clean and well-documented</td>
+              <td><span class="badge-c">3</span> <strong>New OAuth requirements</strong> — stricter app review process adds friction (Nov 2025)</td></tr>
+          <tr><td><span class="badge-s">4</span> <strong>Platform reliability</strong> — mature infrastructure with strong uptime</td>
+              <td><span class="badge-c">4</span> <strong>AI credit limits</strong> — enforcement starting March 2026 may restrict usage</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Anthropic -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🧠</span> Anthropic</h3>
+      <table class="sc-table">
+        <thead><tr><th style="width:50%;">Strengths</th><th>Challenges</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge-s">1</span> <strong>Cleanest API design</strong> — intuitive SDK, consistent patterns, excellent error messages</td>
+              <td><span class="badge-c">1</span> <strong>Narrower model range</strong> — no image gen, TTS, or speech. Text/code focused</td></tr>
+          <tr><td><span class="badge-s">2</span> <strong>Best documentation</strong> — Anthropic Academy, cookbooks, prompt engineering guides</td>
+              <td><span class="badge-c">2</span> <strong>No free API tier</strong> — requires payment to start building (unlike Copilot or OpenAI)</td></tr>
+          <tr><td><span class="badge-s">3</span> <strong>MCP innovation</strong> — Model Context Protocol is becoming an industry standard for tool use</td>
+              <td><span class="badge-c">3</span> <strong>Smaller community</strong> — growing but not yet matching OpenAI's ecosystem size</td></tr>
+          <tr><td><span class="badge-s">4</span> <strong>Strong reasoning models</strong> — Opus and Sonnet excel at complex coding and analysis</td>
+              <td><span class="badge-c">4</span> <strong>Limited app marketplace</strong> — no equivalent to GPT Store or plugin ecosystem</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- OpenAI -->
+    <div class="card">
+      <h3><span style="font-size:24px;">🤖</span> OpenAI</h3>
+      <table class="sc-table">
+        <thead><tr><th style="width:50%;">Strengths</th><th>Challenges</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge-s">1</span> <strong>Broadest capability set</strong> — text, code, images, audio, video all in one API</td>
+              <td><span class="badge-c">1</span> <strong>Premium pricing</strong> — GPT-5 Pro at $168/M output tokens is expensive for heavy use</td></tr>
+          <tr><td><span class="badge-s">2</span> <strong>Largest ecosystem</strong> — GPT Store, AgentKit, Codex; widest 3rd-party integrations</td>
+              <td><span class="badge-c">2</span> <strong>Reliability</strong> — occasional API outages and rate limit frustrations persist</td></tr>
+          <tr><td><span class="badge-s">3</span> <strong>Agent infrastructure</strong> — Responses API, Agents SDK, and Codex for full agent workflows</td>
+              <td><span class="badge-c">3</span> <strong>API complexity</strong> — many endpoints, models, and options can overwhelm newcomers</td></tr>
+          <tr><td><span class="badge-s">4</span> <strong>DevDay &amp; community</strong> — largest AI developer community with strong events program</td>
+              <td><span class="badge-c">4</span> <strong>Frequent API changes</strong> — rapid iteration means developers must stay up to date</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Tab navigation
+  document.querySelectorAll('.nav button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
